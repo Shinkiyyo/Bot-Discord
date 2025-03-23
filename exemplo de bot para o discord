@@ -1,0 +1,92 @@
+import discord
+from discord.ext import commands
+import random
+
+# Configuração dos intents
+intents = discord.Intents.default()
+intents.message_content = True
+intents.reactions = True
+intents.guilds = True
+intents.members = True
+
+
+# Esse bot necessita ter o "!" antes das mensagens, pode mudar o simbolo para o de sua preferencia 
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Coloque seu ID do Discord aqui, isso pode fazer com que alguns comandos só funcionem com o dono du ID
+AUTHORIZED_USER_ID = 648518067713867776
+
+
+#Comandos simples com respostas aleatorias 
+respostas = {
+    'oi': [
+        "oii",
+        "opa",
+        "salve",
+        "oii, tudo bem?",
+        "olá"
+    ],
+    'dia': [
+        "dia",
+        "noite",
+        "sol",
+        "luzes",
+        "zanka no tachi"
+
+    ],
+    'comando_invalido': [
+        "parece que esse comando não existe",
+        "comando invalido",
+        "favor verificar se está correto",
+        "não sei o que responder"
+    ]
+}
+
+
+
+# Comando para apagar mensagens
+# Esse comando só pode ser usado pelo dono du Ia colocado antes
+@bot.command(name='clear')
+async def clear(ctx, amount: int):
+    if ctx.author.id != AUTHORIZED_USER_ID:
+        await ctx.send("Você não tem permissão para usar este comando.")
+        return
+
+    if amount <= 0:
+        await ctx.send("O número de mensagens a serem apagadas deve ser maior que 0.")
+        return
+    
+    # Limita o número de mensagens a serem apagadas a 100
+    if amount > 100:
+        await ctx.send("Você pode apagar no máximo 100 mensagens de uma vez.")
+        return
+
+    await ctx.channel.purge(limit=amount + 1)  # +1 para incluir o comando `!clear` na contagem
+    await ctx.send(f"{amount} mensagens apagadas.", delete_after=5)  # Mensagem de confirmação, desaparece em 5 segundos
+
+
+
+
+
+
+# Comando para responder com mensagens aleatórias
+@bot.command(name='oi')
+async def saudacao(ctx):
+    await ctx.send(random.choice(respostas['oi']))
+
+@bot.command(name='dia')
+async def nero(ctx):
+    await ctx.send(random.choice(respostas['dia']))
+
+
+
+
+# Evento para lidar com erros de comando, incluindo comandos não encontrados
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(random.choice(respostas['comando_invalido']))
+
+
+# Subistitua pelo TOKEN de seu bot
+bot.run('jhkf675644876VB65V65BV58VCcv85b4756vcB63CVB65b8674xcC6B6678')
